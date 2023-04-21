@@ -102,7 +102,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://launcher.golden-helmet.tk/latest.json"
+        "https://launcher.golden-helmet.tk/launcher/latest.json"
       ],
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE2MkMwOENGREEwODI0NTkKUldSWkpBamF6d2dzcHZJSllrZXp6ZENtdXlURlM2NU03Vnp0R1VnaUFsb1VvbXpxUVpJUkRIYW8K"
