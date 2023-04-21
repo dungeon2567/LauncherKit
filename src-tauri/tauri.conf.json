@@ -1,0 +1,104 @@
+{
+  "build": {
+    "beforeBuildCommand": "yarn build",
+    "beforeDevCommand": "yarn dev",
+    "devPath": "http://localhost:3000",
+    "distDir": "../page"
+  },
+  "package": {
+    "productName": "LauncherKit",
+    "version": "2.0.30"
+  },
+  "tauri": {
+    "systemTray": {
+      "iconPath": "../tray_icon_with_transparency.ico",
+      "iconAsTemplate": true
+    },
+    "allowlist": {
+      "fs": {
+        "writeFile": true,
+        "scope": ["$APP/temp", "$APP/temp/*"]
+      },
+      "http": {
+        "all": true,
+        "scope": ["https://launcher.golden-helmet.tk/*"]
+      },
+      "window": {
+        "all": true
+      },
+      "dialog": {
+        "all": true
+      },
+      "path": {
+        "all": true
+      },
+      "globalShortcut": {
+        "all": true
+      },
+      "shell": {
+        "execute": true,
+        "sidecar": true,
+        "scope": [
+          { "name": "s7za", "sidecar": true, "args": true, "execute": true },
+          { "name": "hdiffz", "sidecar": true, "args": true, "execute": true }
+        ]
+      }
+    },
+    "bundle": {
+      "active": true,
+      "category": "DeveloperTool",
+      "copyright": "",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": ["s7za", "hdiffz"],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "identifier": "com.DiegoSoft.LauncherKit",
+      "longDescription": "",
+      "macOS": {
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "resources": [],
+      "shortDescription": "",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
+    },
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://launcher.golden-helmet.tk/latest.json"
+      ],
+      "dialog": false,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE2MkMwOENGREEwODI0NTkKUldSWkpBamF6d2dzcHZJSllrZXp6ZENtdXlURlM2NU03Vnp0R1VnaUFsb1VvbXpxUVpJUkRIYW8K"
+    },
+    "windows": [
+      {
+        "decorations": false,
+        "fullscreen": false,
+        "width": 1366,
+        "height": 768,
+        "resizable": false,
+        "center": true,
+        "theme": "Dark",
+        "title": "LauncherKit"
+      }
+    ]
+  }
+}
