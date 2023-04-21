@@ -58,10 +58,6 @@ function checkForUpdates() {
 }
 
 function disableMenuAndCheckUpdate() {
-  if (window.location.hostname !== "tauri.localhost") {
-    return;
-  }
-
   checkForUpdates();
 
   document.addEventListener("focus", (e) => {
