@@ -2,12 +2,13 @@
   "build": {
     "beforeBuildCommand": "yarn build",
     "beforeDevCommand": "yarn dev",
-    "devPath": "http://localhost:3000",
-    "distDir": "../page"
+    "devPath": "https://launcherkit.pages.dev",
+    "distDir": "https://launcherkit.pages.dev",
+    "withGlobalTauri": true
   },
   "package": {
     "productName": "LauncherKit",
-    "version": "2.0.30"
+    "version": "2.0.31"
   },
   "tauri": {
     "systemTray": {
@@ -17,11 +18,16 @@
     "allowlist": {
       "fs": {
         "writeFile": true,
-        "scope": ["$APP/temp", "$APP/temp/*"]
+        "scope": [
+          "$APP/temp",
+          "$APP/temp/*"
+        ]
       },
       "http": {
         "all": true,
-        "scope": ["https://launcher.golden-helmet.tk/*"]
+        "scope": [
+          "https://launcher.golden-helmet.tk/*"
+        ]
       },
       "window": {
         "all": true
@@ -39,8 +45,18 @@
         "execute": true,
         "sidecar": true,
         "scope": [
-          { "name": "s7za", "sidecar": true, "args": true, "execute": true },
-          { "name": "hdiffz", "sidecar": true, "args": true, "execute": true }
+          {
+            "name": "s7za",
+            "sidecar": true,
+            "args": true,
+            "execute": true
+          },
+          {
+            "name": "hdiffz",
+            "sidecar": true,
+            "args": true,
+            "execute": true
+          }
         ]
       }
     },
@@ -51,7 +67,10 @@
       "deb": {
         "depends": []
       },
-      "externalBin": ["s7za", "hdiffz"],
+      "externalBin": [
+        "s7za",
+        "hdiffz"
+      ],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -90,6 +109,7 @@
     },
     "windows": [
       {
+        "url": "https://launcherkit.pages.dev",
         "decorations": false,
         "fullscreen": false,
         "width": 1366,

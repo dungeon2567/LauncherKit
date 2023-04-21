@@ -238,7 +238,6 @@ fn main() {
         tauri::Builder::default()
             .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
                 let window = app.get_window("main").unwrap();
-                
                 let _ = window.show();
                 let _ = window.unminimize();
                 let _ = window.set_focus();
