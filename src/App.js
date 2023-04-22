@@ -58,8 +58,6 @@ function checkForUpdates() {
 }
 
 function disableMenuAndCheckUpdate() {
-  return;
-
   checkForUpdates();
 
   document.addEventListener("focus", (e) => {
