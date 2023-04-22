@@ -463,8 +463,8 @@ function Main() {
       await openGame(
         gameName,
         config.executable,
-        getAuth().currentUser.stsTokenManager.accessToken,
-        getAuth().currentUser.stsTokenManager.refreshToken
+        "accessToken",
+        "refreshToken"
       );
     } finally {
       setIsPlaying(false);
