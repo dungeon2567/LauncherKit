@@ -717,6 +717,7 @@ function Main() {
                   isPlaying ? (
                     <Button
                       size="sm"
+                      fullWidth
                       loading={true}
                     >
                       Playing
@@ -747,7 +748,7 @@ function Main() {
                     <ActionIcon
                       size={36}
                       ml="sm"
-                      disabled={downloadLoading}
+                      disabled={downloadLoading || isPlaying}
                     >
                       <Settings />
                     </ActionIcon>
