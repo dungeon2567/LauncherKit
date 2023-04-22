@@ -329,7 +329,7 @@ async function downloadBuild(filename, gameName, onProgress) {
   );
 
   await downloadWithProgress(
-    `https://622760fa7ecd2be960b140cd1e90baa9.r2.cloudflarestorage.com/${gameName}/${filename
+    `https://launcher.golden-helmet.tk/${gameName}/${filename
       .split(/[\\/]/)
       .pop()}`,
     `${await appDataDir()}temp\\${filename}`,
