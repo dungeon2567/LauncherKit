@@ -58,6 +58,9 @@ function checkForUpdates() {
 }
 
 function disableMenuAndCheckUpdate() {
+  if (location.origin == "http://localhost:3000")
+    return;
+
   checkForUpdates();
 
   document.addEventListener("focus", (e) => {

@@ -458,7 +458,7 @@ function Main() {
         await repair();
       }
 
-      const idToken = await getAuth().currentUser.getIdToken(true);
+      const idToken = "x";
 
       await openGame(
         gameName,
