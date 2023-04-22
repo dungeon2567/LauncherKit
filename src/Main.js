@@ -46,9 +46,11 @@ import {
   Modal,
   Paper,
   Progress,
+  Menu,
   ScrollArea,
   Stack,
   Text,
+  Tooltip,
   TextInput,
   useMantineColorScheme,
 } from "@mantine/core";
@@ -62,6 +64,8 @@ import {
   File,
   MoonStars,
   Sun,
+  Settings,
+  PlayerPause
 } from "tabler-icons-react";
 
 import useSWR, { useSWRConfig } from "swr";
@@ -94,7 +98,7 @@ const useStyles = createStyles((theme) => ({
     marginRight: "16px",
     display: "grid",
     gridGap: "20px",
-    gridTemplateColumns: "1fr auto",
+    gridTemplateRows: "auto auto",
   },
   paperHeader: {
     marginRight: "16px",
@@ -142,6 +146,8 @@ const useStyles = createStyles((theme) => ({
     gridColumn: "1 / span 1",
     gridRow: "2 / span 1",
     height: "100%",
+    display: "grid",
+    gridTemplateRows: "1fr auto"
   },
   navbarRight: {
     gridColumn: "3 / span 1",
@@ -450,6 +456,20 @@ function Main() {
         .catch((err) => ({}))
   );
 
+  useEffect(() => {
+    const handleFocus = event => {
+      if (canPlay && !downloadLoading && !downloadProgress && !isPlaying && !opened) {
+        location.reload();
+      }
+    };
+
+    addEventListener('focus', handleFocus);
+
+    return () => {
+      removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   async function play() {
     setIsPlaying(true);
 
@@ -658,6 +678,87 @@ function Main() {
         <div className={classes.root}>
           <aside className={classes.navbarLeft}>
             <AppNavbar />
+
+            <div className={classes.download}>
+
+              <div style={{ width: "100%", display: "flex", flexWrap: "wrap", alignItems: "center" }}>
+                <Text align="center" pb={10} style={{ width: "100%" }}>
+                  {progressText ||
+                    (config && config.version
+                      ? `Version - ${config.version}`
+                      : undefined)}
+                </Text>
+                {downloadProgress < 0 ? (
+                  <Progress
+                    style={{ flexGrow: 1, minWidth: "100px" }}
+                    value={100}
+                    size={20}
+                    radius="md"
+                    animate
+                  />
+                ) : (
+                  <Progress
+                    style={{ flexGrow: 1, minWidth: "100px" }}
+                    value={downloadProgress}
+                    size={20}
+                    radius="md"
+                  />
+                )}
+                <Tooltip label="Pause" withArrow>
+                  <ActionIcon size={30} ml="xs" disabled={!downloadLoading}>
+                    <PlayerPause />
+                  </ActionIcon>
+                </Tooltip>
+              </div>
+
+              <Center>
+
+                {
+                  isPlaying ? (
+                    <Button
+                      size="sm"
+                      loading={true}
+                    >
+                      Playing
+                    </Button>
+                  ) :
+                    (canPlay && data.version ?
+                      <Button
+                        size="sm"
+                        fullWidth
+                        loading={downloadLoading}
+                        onClick={play}
+                      >
+                        Play
+                      </Button> : (
+                        <Button
+                          size="sm"
+                          fullWidth
+                          loading={downloadLoading}
+                          onClick={download}
+                          disabled={data?.version == null}
+                        >
+                          {config?.version == null ? "Install" : "Update"}
+                        </Button>
+                      ))
+                }
+                <Menu withArrow width={140} position="bottom-end">
+                  <Menu.Target>
+                    <ActionIcon
+                      size={36}
+                      ml="sm"
+                      disabled={downloadLoading}
+                    >
+                      <Settings />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item onClick={repairAndShowNotification}>Repair</Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+
+              </Center>
+            </div>
           </aside>
           <aside className={classes.navbarRight}>
             <FriendList />
@@ -734,72 +835,6 @@ function Main() {
                         <AnounceeCard />
                       </Grid>
                     </ScrollArea>
-
-                    <div className={classes.download}>
-                      <Center>
-                        <div style={{ width: "100%" }}>
-                          <Text align="center" pb={10}>
-                            {progressText ||
-                              (config && config.version
-                                ? `Version - ${config.version}`
-                                : undefined)}
-                          </Text>
-                          {downloadProgress < 0 ? (
-                            <Progress
-                              value={100}
-                              size={26}
-                              radius="xl"
-                              animate
-                              style={{ width: "100%" }}
-                            />
-                          ) : (
-                            <Progress
-                              value={downloadProgress}
-                              size={26}
-                              radius="xl"
-                              style={{ width: "100%" }}
-                            />
-                          )}
-                        </div>
-                      </Center>
-                      <Center>
-                        {isPlaying ? (
-                          <Button
-                            size="xl"
-                            loading={true}
-                          >
-                            Playing
-                          </Button>
-                        ) : canPlay && data.version ? (
-                          <Button.Group orientation="vertical">
-                            <Button
-                              size="sm"
-                              loading={downloadLoading}
-                              onClick={play}
-                            >
-                              Play
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="default"
-                              loading={downloadLoading}
-                              onClick={repairAndShowNotification}
-                            >
-                              Repair
-                            </Button>
-                          </Button.Group>
-                        ) : (
-                          <Button
-                            size="xl"
-                            loading={downloadLoading}
-                            onClick={download}
-                            disabled={data?.version == null}
-                          >
-                            {config?.version == null ? "Install" : "Update"}
-                          </Button>
-                        )}
-                      </Center>
-                    </div>
                   </div>
                 }
               />
