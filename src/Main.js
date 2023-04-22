@@ -454,18 +454,17 @@ function Main() {
     setIsPlaying(true);
 
     try {
-      if (!(await validateBuildSize())) {
+      if (await validateBuildSize()) {
+        await openGame(
+          gameName,
+          config.executable,
+          "accessToken",
+          "refreshToken"
+        );
+      }
+      else {
         await repair();
       }
-
-      const idToken = "x";
-
-      await openGame(
-        gameName,
-        config.executable,
-        "accessToken",
-        "refreshToken"
-      );
     } finally {
       setIsPlaying(false);
     }

@@ -32,7 +32,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 function Root() {
   const [colorScheme, toggleColorScheme] = useToggle(["dark", "light"]);
-  const { classes, cx } = useStyles();
+  const { classes } = useStyles();
   const [appVersion, setAppVersion] = useState(null);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ function Root() {
       setAppVersion(appVersion);
     });
   });
-  
+
   return (
     <ColorSchemeProvider
       colorScheme={colorScheme}
