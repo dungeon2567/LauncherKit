@@ -5,16 +5,19 @@ import { fetch } from "@tauri-apps/api/http";
 import { appDataDir } from "@tauri-apps/api/path";
 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 import { fs } from "@tauri-apps/api";
 
 const client = new S3Client({
-  endpoint: "https://622760fa7ecd2be960b140cd1e90baa9.r2.cloudflarestorage.com/launcher",
-  accessKeyId: "96999ef10637dcf60b05949503ea2ccf",
-  secretAccessKey:
-    "9519d39266def98aa7767d7db2373e266bb2d7166d7958336b0239aa6c259cf7",
+  endpoint: "https://622760fa7ecd2be960b140cd1e90baa9.r2.cloudflarestorage.com",
+  credentials: {
+    accessKeyId: "96999ef10637dcf60b05949503ea2ccf",
+    secretAccessKey:
+      "9519d39266def98aa7767d7db2373e266bb2d7166d7958336b0239aa6c259cf7"
+  },
   signatureVersion: "v4",
+  region: "auto"
 });
 
 function uuidv4() {
@@ -267,26 +270,27 @@ async function uploadWithProgress(url, filename, onProgress, headers) {
   }
 }
 
-async function uploadBuild(filename, gameName, onProgress) {
-  const getObjectParams = {
-    Bucket: `launcher`,
-    Key: `${gameName}/${filename.split(/[\\/]/).pop()}`,
+async function uploadFile(fileName, key, onProgress) {
+  const putObjectParams = {
+    Bucket: "launcher",
+    Key: key
   };
 
-  const command = new GetObjectCommand(getObjectParams);
+  const command = new PutObjectCommand(putObjectParams);
   const url = await getSignedUrl(client, command, { expiresIn: 3600 });
 
-  debugger;
-
   await uploadWithProgress(
-    data.url,
-    filename,
+    url,
+    fileName,
     (event) => {
       onProgress &&
         onProgress((event.payload.current / event.payload.total) * 100);
-    },
-    data.headers
+    }
   );
+}
+
+async function uploadBuild(fileName, gameName, onProgress) {
+  await uploadFile(fileName, `${gameName}/${fileName.split(/[\\/]/).pop()}`, onProgress);
 }
 
 async function uploadManifest(
@@ -299,13 +303,6 @@ async function uploadManifest(
   from,
   onProgress
 ) {
-  const { data } = await fetch(
-    `https://file-service-worker.worlds-embrace.workers.dev/${gameName}/manifest.json`,
-    {
-      method: "PUT",
-    }
-  );
-
   for (let key in from) {
     from[key] = from[key].split(/[\\/]/).pop();
   }
@@ -323,15 +320,7 @@ async function uploadManifest(
     })
   );
 
-  await uploadWithProgress(
-    data.url,
-    `${await appDataDir()}temp\\manifest.json`,
-    (event) => {
-      onProgress &&
-        onProgress((event.payload.current / event.payload.total) * 100);
-    },
-    data.headers
-  );
+  await uploadFile(`${await appDataDir()}temp\\manifest.json`, `${gameName}/manifest.json`, onProgress);
 }
 
 async function downloadBuild(filename, gameName, onProgress) {
@@ -340,7 +329,7 @@ async function downloadBuild(filename, gameName, onProgress) {
   );
 
   await downloadWithProgress(
-    `https://file-service-worker.worlds-embrace.workers.dev/${gameName}/${filename
+    `https://622760fa7ecd2be960b140cd1e90baa9.r2.cloudflarestorage.com/${gameName}/${filename
       .split(/[\\/]/)
       .pop()}`,
     `${await appDataDir()}temp\\${filename}`,

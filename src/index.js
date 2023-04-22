@@ -40,9 +40,7 @@ function Root() {
       setAppVersion(appVersion);
     });
   });
-
-  console.log(appVersion);
-
+  
   return (
     <ColorSchemeProvider
       colorScheme={colorScheme}

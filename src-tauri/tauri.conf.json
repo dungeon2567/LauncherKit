@@ -2,7 +2,7 @@
   "build": {
     "beforeBuildCommand": "yarn build",
     "beforeDevCommand": "yarn dev",
-    "devPath": "https://launcherkit.pages.dev",
+    "devPath": "http://localhost:3000",
     "distDir": "https://launcherkit.pages.dev",
     "withGlobalTauri": true
   },
@@ -102,14 +102,13 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://launcher.golden-helmet.tk/launcher/latest.json"
+        "https://launcher.golden-helmet.tk/latest.json"
       ],
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE2MkMwOENGREEwODI0NTkKUldSWkpBamF6d2dzcHZJSllrZXp6ZENtdXlURlM2NU03Vnp0R1VnaUFsb1VvbXpxUVpJUkRIYW8K"
     },
     "windows": [
       {
-        "url": "https://launcherkit.pages.dev",
         "decorations": false,
         "fullscreen": false,
         "width": 1366,

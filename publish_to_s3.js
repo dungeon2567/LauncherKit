@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 const s3 = new S3({
-  endpoint: "https://622760fa7ecd2be960b140cd1e90baa9.r2.cloudflarestorage.com/launcher",
+  endpoint: "https://622760fa7ecd2be960b140cd1e90baa9.r2.cloudflarestorage.com",
   accessKeyId: "96999ef10637dcf60b05949503ea2ccf",
   secretAccessKey:
     "9519d39266def98aa7767d7db2373e266bb2d7166d7958336b0239aa6c259cf7",
@@ -27,7 +27,7 @@ const uploadDir = function (s3Path, bucketName) {
     let bucketPath = filePath.substring(s3Path.length);
     let params = {
       Bucket: bucketName,
-      Key: bucketPath,
+      Key: `launcher-kit/${bucketPath}`,
       Body: fs.readFileSync(filePath),
     };
     s3.putObject(params, function (err, data) {
@@ -53,7 +53,7 @@ const latest_json = JSON.stringify({
       signature: fs.readFileSync(
         `src-tauri\\target\\release\\bundle\\msi\\${config.package.productName}_${config.package.version}_x64_en-US.msi.zip.sig`, 'utf8'
       ),
-      url: `https://launcher.golden-helmet.tk/launcher/${config.package.productName}_${config.package.version}_x64_en-US.msi.zip`,
+      url: `https://launcher.golden-helmet.tk/launcher-kit/${config.package.productName}_${config.package.version}_x64_en-US.msi.zip`,
     },
   },
 });
@@ -62,7 +62,7 @@ uploadDir("src-tauri\\target\\release\\bundle\\msi\\", "launcher");
 
 let params = {
   Bucket: "launcher",
-  Key: "latest.json",
+  Key: "launcher-kit/latest.json",
   Body: latest_json,
 };
 
