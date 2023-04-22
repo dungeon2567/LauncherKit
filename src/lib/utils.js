@@ -328,6 +328,10 @@ async function downloadBuild(filename, gameName, onProgress) {
     (err) => { }
   );
 
+  console.log(`https://launcher.golden-helmet.tk/${gameName}/${filename
+  .split(/[\\/]/)
+  .pop()}`);
+
   await downloadWithProgress(
     `https://launcher.golden-helmet.tk/${gameName}/${filename
       .split(/[\\/]/)

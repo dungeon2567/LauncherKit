@@ -232,7 +232,7 @@ function UserModalForm({ onClose, config, mergeConfig, gameName }) {
         (value) =>
           config?.version
             ? compareVersions.validate(value) &&
-              compareVersions(config.version, value) < 0
+            compareVersions(config.version, value) < 0
             : true
       )
       .test("validateVersion", "Invalid version string.", (value) =>
@@ -308,8 +308,7 @@ function UserModalForm({ onClose, config, mergeConfig, gameName }) {
                 setProgress(parseFloat(progress));
 
                 setProgressText(
-                  `Uploading files - ${Math.floor(progress)}% (${it + 1}/${
-                    uploadFiles.length
+                  `Uploading files - ${Math.floor(progress)}% (${it + 1}/${uploadFiles.length
                   })`
                 );
               });
@@ -334,7 +333,7 @@ function UserModalForm({ onClose, config, mergeConfig, gameName }) {
             });
 
             mutate(
-              `https://file-service-worker.worlds-embrace.workers.dev/${gameName}/manifest.json`
+              `https://launcher.golden-helmet.tk/${gameName}/manifest.json`
             );
 
             onClose();
@@ -515,8 +514,7 @@ function Main() {
             setDownloadProgress(parseFloat(progress));
 
             setProgressText(
-              `Downloading files - ${Math.floor(progress)}% (${it + 1}/${
-                data.files.length
+              `Downloading files - ${Math.floor(progress)}% (${it + 1}/${data.files.length
               })`
             );
           });
