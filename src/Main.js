@@ -443,7 +443,7 @@ function Main() {
 
   const { data, error } = useSWR(
     gameName
-      ? `https://file-service-worker.worlds-embrace.workers.dev/${gameName}/manifest.json`
+      ? `https://launcher.golden-helmet.tk/${gameName}/manifest.json`
       : null,
     (url) =>
       fetch(url)
