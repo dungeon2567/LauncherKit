@@ -2,11 +2,20 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { listen } from "@tauri-apps/api/event";
 import { Command } from "@tauri-apps/api/shell";
 import { fetch } from "@tauri-apps/api/http";
-import { appDir } from "@tauri-apps/api/path";
+import { appDataDir } from "@tauri-apps/api/path";
+
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
 import { fs } from "@tauri-apps/api";
 
-const url = "https://file-service-worker.worlds-embrace.workers.dev";
+const client = new S3Client({
+  endpoint: "https://622760fa7ecd2be960b140cd1e90baa9.r2.cloudflarestorage.com/launcher",
+  accessKeyId: "96999ef10637dcf60b05949503ea2ccf",
+  secretAccessKey:
+    "9519d39266def98aa7767d7db2373e266bb2d7166d7958336b0239aa6c259cf7",
+  signatureVersion: "v4",
+});
 
 function uuidv4() {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -42,26 +51,26 @@ function fileExists(path) {
 }
 
 async function cleanTemp() {
-  await invoke("remove_dir", { path: `${await appDir()}temp` }).catch(
-    (err) => {}
+  await invoke("remove_dir", { path: `${await appDataDir()}temp` }).catch(
+    (err) => { }
   );
 }
 
 async function diffBuild(folder, gameName, fromVersion, toVersion) {
-  await invoke("create_dir", { path: `${await appDir()}temp` }).catch(
-    (err) => {}
+  await invoke("create_dir", { path: `${await appDataDir()}temp` }).catch(
+    (err) => { }
   );
 
   const args = [
     "-D",
     "-f",
-    `${await appDir()}Games\\${gameName}`,
+    `${await appDataDir()}Games\\${gameName}`,
     `${folder}`,
-    `${await appDir()}temp\\PATCH_${fromVersion
+    `${await appDataDir()}temp\\PATCH_${fromVersion
       .replace(".", "_")
       .replace(".", "_")}_TO_${toVersion
-      .replace(".", "_")
-      .replace(".", "_")}.bin`,
+        .replace(".", "_")
+        .replace(".", "_")}.bin`,
   ];
 
   return await new Promise((resolve, reject) => {
@@ -77,11 +86,11 @@ async function diffBuild(folder, gameName, fromVersion, toVersion) {
 
     ls.on("close", async (code) => {
       resolve(
-        `${await appDir()}temp\\PATCH_${fromVersion
+        `${await appDataDir()}temp\\PATCH_${fromVersion
           .replace(".", "_")
           .replace(".", "_")}_TO_${toVersion
-          .replace(".", "_")
-          .replace(".", "_")}.bin`
+            .replace(".", "_")
+            .replace(".", "_")}.bin`
       );
     });
 
@@ -178,15 +187,15 @@ async function hashBuild(folder, onProgress, removeFirstFolder = true) {
 
 async function hashGameBuild(gameName, onProgress) {
   return await hashBuild(
-    `${await appDir()}Games\\${gameName}`,
+    `${await appDataDir()}Games\\${gameName}`,
     onProgress,
     true
   );
 }
 
 async function compressBuild(version, folder, onProgress) {
-  await invoke("create_dir", { path: `${await appDir()}temp` }).catch(
-    (err) => {}
+  await invoke("create_dir", { path: `${await appDataDir()}temp` }).catch(
+    (err) => { }
   );
 
   let args = [
@@ -194,7 +203,7 @@ async function compressBuild(version, folder, onProgress) {
     "-aoa",
     "-bsp1",
     "-v1024m",
-    `${await appDir()}temp\\Game_${version
+    `${await appDataDir()}temp\\Game_${version
       .replace(".", "_")
       .replace(".", "_")}.7z`,
     `${folder}\\*`,
@@ -225,7 +234,7 @@ async function compressBuild(version, folder, onProgress) {
       let result = [];
 
       let entries = await invoke("file_size_recursive", {
-        path: `${await appDir()}temp`,
+        path: `${await appDataDir()}temp`,
       });
 
       for (const entry of Object.keys(entries)) {
@@ -259,14 +268,15 @@ async function uploadWithProgress(url, filename, onProgress, headers) {
 }
 
 async function uploadBuild(filename, gameName, onProgress) {
-  const { data } = await fetch(
-    `https://file-service-worker.worlds-embrace.workers.dev/${gameName}/${filename
-      .split(/[\\/]/)
-      .pop()}`,
-    {
-      method: "PUT",
-    }
-  );
+  const getObjectParams = {
+    Bucket: `launcher`,
+    Key: `${gameName}/${filename.split(/[\\/]/).pop()}`,
+  };
+
+  const command = new GetObjectCommand(getObjectParams);
+  const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+
+  debugger;
 
   await uploadWithProgress(
     data.url,
@@ -301,7 +311,7 @@ async function uploadManifest(
   }
 
   await fs.writeTextFile(
-    `${await appDir()}temp\\manifest.json`,
+    `${await appDataDir()}temp\\manifest.json`,
     JSON.stringify({
       gameName,
       files: files.map((file) => file.split(/[\\/]/).pop()),
@@ -315,7 +325,7 @@ async function uploadManifest(
 
   await uploadWithProgress(
     data.url,
-    `${await appDir()}temp\\manifest.json`,
+    `${await appDataDir()}temp\\manifest.json`,
     (event) => {
       onProgress &&
         onProgress((event.payload.current / event.payload.total) * 100);
@@ -325,15 +335,15 @@ async function uploadManifest(
 }
 
 async function downloadBuild(filename, gameName, onProgress) {
-  await invoke("create_dir", { path: `${await appDir()}temp` }).catch(
-    (err) => {}
+  await invoke("create_dir", { path: `${await appDataDir()}temp` }).catch(
+    (err) => { }
   );
 
   await downloadWithProgress(
     `https://file-service-worker.worlds-embrace.workers.dev/${gameName}/${filename
       .split(/[\\/]/)
       .pop()}`,
-    `${await appDir()}temp\\${filename}`,
+    `${await appDataDir()}temp\\${filename}`,
     (event) => {
       onProgress &&
         onProgress((event.payload.current / event.payload.total) * 100);
@@ -343,15 +353,15 @@ async function downloadBuild(filename, gameName, onProgress) {
 
 async function removeBuild(gameName) {
   return await invoke("remove_dir", {
-    path: `${await appDir()}Games\\${gameName}`,
-  }).catch((err) => {});
+    path: `${await appDataDir()}Games\\${gameName}`,
+  }).catch((err) => { });
 }
 
 async function installBuild(gameName, version, onProgress) {
   await removeBuild(gameName);
 
-  await invoke("create_dir", { path: `${await appDir()}Games` }).catch(
-    (err) => {}
+  await invoke("create_dir", { path: `${await appDataDir()}Games` }).catch(
+    (err) => { }
   );
 
   return await new Promise(async (resolve, reject) => {
@@ -359,10 +369,10 @@ async function installBuild(gameName, version, onProgress) {
       "x",
       "-aoa",
       "-bsp1",
-      `${await appDir()}temp\\Game_${version
+      `${await appDataDir()}temp\\Game_${version
         .replace(".", "_")
         .replace(".", "_")}.7z.001`,
-      `-o${await appDir()}Games\\${gameName}`,
+      `-o${await appDataDir()}Games\\${gameName}`,
     ];
 
     const ls = Command.sidecar("s7za", args);
@@ -394,19 +404,19 @@ async function installBuild(gameName, version, onProgress) {
 }
 
 async function upgradeBuild(gameName, fromVersion, toVersion) {
-  await invoke("create_dir", { path: `${await appDir()}temp` }).catch(
-    (err) => {}
+  await invoke("create_dir", { path: `${await appDataDir()}temp` }).catch(
+    (err) => { }
   );
 
   const args = [
     "--patch",
     "-f",
-    `${await appDir()}Games\\${gameName}`,
-    `${await appDir()}temp\\PATCH_${fromVersion
+    `${await appDataDir()}Games\\${gameName}`,
+    `${await appDataDir()}temp\\PATCH_${fromVersion
       .replace(".", "_")
       .replace(".", "_")}_TO_${toVersion
-      .replace(".", "_")
-      .replace(".", "_")}.bin`,
+        .replace(".", "_")
+        .replace(".", "_")}.bin`,
     `.\\Games\\${gameName}`,
   ];
 
@@ -431,7 +441,7 @@ async function upgradeBuild(gameName, fromVersion, toVersion) {
 
 async function openGame(gameName, executable, accessToken, refreshToken) {
   return await invoke("open_game", {
-    exe: `${await appDir()}Games\\${gameName}\\${executable}`,
+    exe: `${await appDataDir()}Games\\${gameName}\\${executable}`,
     refreshToken: refreshToken,
     accessToken: accessToken,
   });
@@ -455,7 +465,7 @@ async function fileSizeBuild(folder) {
 }
 
 async function fileSizeGameBuild(gameName) {
-  return await fileSizeBuild(`${await appDir()}Games\\${gameName}`);
+  return await fileSizeBuild(`${await appDataDir()}Games\\${gameName}`);
 }
 
 export {
