@@ -58,7 +58,7 @@ function Root() {
 
         <div className={classes.navbar}>
           <div className={classes.navbarDrag} data-tauri-drag-region>
-            Launcher Kit - {appVersion}
+            Launcher Kit - {appVersion} - New Version
           </div>
           <ActionIcon
             p={2}
